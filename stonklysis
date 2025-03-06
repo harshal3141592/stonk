@@ -1,0 +1,97 @@
+import pandas as pd
+import yfinance as yf
+import matplotlib.pyplot as plt
+
+def get_stock_data(ticker, period):
+     stock_data = yf.Ticker(ticker)
+     data = stock_data.history(period=period)
+     return data
+
+def calculate_stock_metrics(data):
+    """
+    Calculate stock metrics.
+    
+    Parameters:
+    data (pandas.DataFrame): Stock data.
+    
+    Returns:
+    dict: Stock metrics.
+    """
+    metrics = {
+        'Open': data['Open'].iloc[-1],
+        'High': data['High'].iloc[-1],
+        'Low': data['Low'].iloc[-1],
+        'Close': data['Close'].iloc[-1],
+        'Volume': data['Volume'].iloc[-1],
+        'Moving Average (50-day)': data['Close'].rolling(window=50).mean().iloc[-1],
+        'Moving Average (200-day)': data['Close'].rolling(window=200).mean().iloc[-1],
+    }
+    return metrics
+
+def analyze_stock(data):
+    """
+    Analyze stock performance.
+    
+    Parameters:
+    data (pandas.DataFrame): Stock data.
+    
+    Returns:
+    str: Stock analysis.
+    """
+    analysis = ''
+    if data['Close'].iloc[-1] > data['Close'].iloc[0]:
+        analysis += 'The stock has been performing well, with a positive return over the given period.\n'
+    else:
+        analysis += 'The stock has not been performing well, with a negative return over the given period.\n'
+    
+    if data['Close'].iloc[-1] > data['Close'].rolling(window=50).mean().iloc[-1]:
+        analysis += 'The current price is above the 50-day moving average, indicating a potential buying opportunity.\n'
+    elif data['Close'].iloc[-1] < data['Close'].rolling(window=50).mean().iloc[-1]:
+        analysis += 'The current price is below the 50-day moving average, indicating a potential selling opportunity.\n'
+    
+    if data['Close'].iloc[-1] > data['Close'].rolling(window=200).mean().iloc[-1]:
+        analysis += 'The current price is above the 200-day moving average, indicating a potential long-term buying opportunity.\n'
+    elif data['Close'].iloc[-1] < data['Close'].rolling(window=200).mean().iloc[-1]:
+        analysis += 'The current price is below the 200-day moving average, indicating a potential long-term selling opportunity.\n'
+    
+    return analysis
+
+def visualize_stock(data, ticker = 'Unknown '):
+    """
+    Visualize stock performance.
+    
+    Parameters:
+    data (pandas.DataFrame): Stock data.
+    ticker (str): Stock ticker symbol.
+    """
+    plt.figure(figsize=(12, 6))
+    plt.plot(data['Close'], label='Close Price')
+    plt.plot(data['Close'].rolling(window=50).mean(), label='50-day Moving Average')
+    plt.plot(data['Close'].rolling(window=200).mean(), label='200-day Moving Average')
+    plt.title(f'{ticker} Stock Performance')
+    plt.xlabel('Date')
+    plt.ylabel('Price (USD)')
+    plt.legend()
+    plt.savefig(f'{ticker}_stock_performance.png')
+    plt.close()
+
+def main():
+    ticker = input("Enter the stock ticker symbol: ")
+    period = input("Enter the time period (e.g., '1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'): ")
+    
+    data = get_stock_data(ticker, period)
+    metrics = calculate_stock_metrics(data)
+    analysis = analyze_stock(data)
+    
+    print("Stock Metrics:")
+    for metric, value in metrics.items():
+        print(f"{metric}: {value}")
+    
+    print("\nStock Analysis:")
+    print(analysis)
+    
+    visualize_stock(data)
+
+if __name__ == "__main__":
+    main()
+     
