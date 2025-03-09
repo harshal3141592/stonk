@@ -13,10 +13,10 @@ Calculates key metrics such as moving averages and current price
 
 Requirements
 
-Python 3.x
-yfinance library (pip install yfinance)
-matplotlib library (pip install matplotlib)
-pandas library (pip install pandas)
+1. Python 3.x
+2. yfinance library (pip install yfinance)
+3. matplotlib library (pip install matplotlib)
+4. pandas library (pip install pandas)
 
 Usage
 
